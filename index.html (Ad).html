@@ -2,1032 +2,835 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webvisit Earn - Admin Panel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AdClickEarn • Earn by clicking ads</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        
-        .sidebar {
-            position: fixed; top: 0; left: 0; height: 100%; width: 250px;
-            z-index: 40; background-color: #1f2937; color: #d1d5db;
-            transform: translateX(-100%); transition: transform 0.3s ease-in-out;
+        /* (styles unchanged – same as before) */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body {
+            background: linear-gradient(145deg, #0b1a33 0%, #1b3b4f 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 16px 16px 80px;
         }
-        .sidebar.show { transform: translateX(0); }
-        .sidebar-overlay {
-            display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); z-index: 30;
+        .scrolling-warning {
+            background: linear-gradient(90deg, #b91c1c, #c2410c, #b91c1c);
+            color: white;
+            padding: 10px 0;
+            border-radius: 40px;
+            margin-bottom: 20px;
+            overflow: hidden;
         }
-        .sidebar.show + .sidebar-overlay { display: block; }
-        .sidebar a { border-left: 3px solid transparent; transition: all 0.2s; }
-        .sidebar a:hover { background-color: #374151; }
-        .sidebar a.active { background-color: #4f46e5; color: white; border-left-color: #818cf8; }
-
-        .main-content { width: 100%; }
-
-        @media (min-width: 768px) {
-            .sidebar { position: static; transform: translateX(0); flex-shrink: 0; }
-            .sidebar-overlay, .mobile-header { display: none; }
-            .main-content-container { display: flex; }
+        .warning-content {
+            display: inline-block;
+            white-space: nowrap;
+            animation: scrollLeft 30s linear infinite;
+            font-weight: 600;
+            padding-left: 100%;
         }
+        .warning-content i { margin: 0 15px; color: #fde047; }
+        @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        .stat-card { background-color: white; border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.5s; }
-        .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 600; transition: all 0.2s; }
-        .btn:active { transform: scale(0.95); }
-        .btn-primary { background-color: #4f46e5; color: white; }
-        .btn-primary:hover { background-color: #4338ca; }
-        .btn-success { background-color: #10b981; color: white; }
-        .btn-danger { background-color: #ef4444; color: white; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background-color: #f9fafb; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        
-        .task-link-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
-        .task-link-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; background: white; }
-        .task-link-number { background: #4f46e5; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-bottom: 0.5rem; }
-        .website-visit-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .website-visit-item { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; background: white; }
+        header {
+            background: rgba(10, 25, 40, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 40px;
+            padding: 16px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,215,0,0.2);
+        }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { color: #fbbf24; font-size: 34px; }
+        .logo h1 { color: white; font-weight: 700; font-size: 1.8rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-section { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .balance-box {
+            background: linear-gradient(145deg, #0f2a3f, #1d4a5f);
+            border: 1px solid #fbbf2440;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+        .balance-amount { font-size: 1.5rem; color: #fbbf24; margin-left: 6px; }
+
+        .btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .btn-primary { background: #2563eb; }
+        .btn-success { background: #059669; }
+        .btn-danger { background: #b91c1c; }
+        .btn-purple { background: #7c3aed; }
+
+        .panel { display: none; animation: fade 0.25s; }
+        .panel.active-panel { display: block; }
+        @keyframes fade { from { opacity: 0.5; } to { opacity: 1; } }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 18px 12px;
+            text-align: center;
+            border: 1px solid #ffffff20;
+        }
+        .stat-label { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; }
+        .stat-value { font-size: 1.7rem; font-weight: 700; color: #fbbf24; }
+        .referral-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 28px;
+            padding: 24px;
+            border: 1px solid #fbbf2430;
+            margin: 20px 0;
+        }
+        .ref-link-container {
+            display: flex;
+            background: #0b1a2b;
+            border-radius: 60px;
+            border: 1px solid #3b4e5e;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .ref-link { flex: 1; padding: 14px 18px; background: transparent; border: none; color: white; outline: none; }
+        .ref-copy-btn { background: #fbbf24; border: none; padding: 0 25px; font-weight: bold; color: #0b1a2b; cursor: pointer; }
+        .ref-copy-btn:hover { background: #f59e0b; }
+
+        .ads-container {
+            display: grid;
+            grid-template-columns: repeat(2,1fr);
+            gap: 10px;
+            max-height: 650px;
+            overflow-y: auto;
+            padding: 8px 4px;
+            margin-top: 16px;
+        }
+        .ad-card {
+            background: rgba(20, 40, 55, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 20px;
+            padding: 12px 10px;
+            border: 1px solid #3b5e6b;
+        }
+        .ad-card:hover { border-color: #fbbf24; }
+        .ad-header { display: flex; justify-content: space-between; font-size: 0.8rem; }
+        .ad-id { background: #2563eb; padding: 4px 10px; border-radius: 30px; color: white; }
+        .ad-amount { color: #fbbf24; font-weight: 700; }
+        .ad-btn {
+            width: 100%;
+            background: linear-gradient(145deg, #2563eb, #1e40af);
+            border: none;
+            color: white;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .ad-btn:disabled { background: #475569; opacity: 0.6; cursor: not-allowed; }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 30px);
+            max-width: 550px;
+            background: rgba(10, 25, 40, 0.9);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 6px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,215,0,0.25);
+            z-index: 1000;
+        }
+        .nav-item {
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 40px;
+            cursor: pointer;
+            flex: 1;
+        }
+        .nav-item i { font-size: 1.4rem; color: #9ca3af; margin-bottom: 2px; }
+        .nav-item.active { background: #fbbf2420; color: #fbbf24; }
+        .nav-item.active i { color: #fbbf24; }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: #122b39;
+            border-radius: 40px;
+            padding: 28px;
+            width: 90%;
+            max-width: 450px;
+            border: 1px solid #fbbf2450;
+        }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-modal { background: none; border: none; font-size: 28px; color: #aaa; cursor: pointer; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { color: #cbd5e1; display: block; margin-bottom: 6px; }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 18px;
+            background: #1e3a4a;
+            border: 1px solid #3a5f6f;
+            border-radius: 40px;
+            color: white;
+            outline: none;
+        }
+        .form-group input:focus { border-color: #fbbf24; }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 24px;
+            border-radius: 50px;
+            background: #1e3a4a;
+            color: white;
+            font-weight: 600;
+            z-index: 3000;
+            border-left: 6px solid;
+            animation: slide 0.3s;
+        }
+        .notification.success { border-color: #10b981; }
+        .notification.error { border-color: #ef4444; }
+        @keyframes slide { from { transform: translateX(100%); opacity: 0; } }
+
+        .withdraw-section { background: rgba(0,0,0,0.3); border-radius: 40px; padding: 24px; text-align: center; margin-top: 24px; }
+        .bdt-symbol { color: #fbbf24; font-weight: 700; }
+        .progress-bar { height: 8px; background: #1e3a4a; border-radius: 20px; margin: 12px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #fbbf24, #f59e0b); width: 0%; }
+
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #1e3a4a; border-radius: 40px; margin-bottom: 12px; }
+        .toggle-switch { width: 50px; height: 26px; background: #4b5563; border-radius: 30px; position: relative; cursor: pointer; }
+        .toggle-switch.active { background: #fbbf24; }
+        .toggle-switch::after { content: ''; position: absolute; width: 22px; height: 22px; background: white; border-radius: 50%; top: 2px; left: 2px; transition: 0.2s; }
+        .toggle-switch.active::after { left: 26px; }
     </style>
 </head>
 <body>
+    <div class="scrolling-warning">
+        <div class="warning-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            সতর্কতা: এই সাইটে প্রাপ্তবয়স্ক বিজ্ঞাপন আসতে পারে, তার জন্য আমরা দুঃখিত। ধন্যবাদ 🤝❣️
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+    </div>
 
-    <div id="app-container" class="hidden">
-        <header class="mobile-header md:hidden sticky top-0 z-20 flex items-center justify-between p-4 bg-white shadow-md">
-            <h1 id="page-title" class="text-xl font-bold text-gray-800">Dashboard</h1>
-            <button id="menu-toggle-btn"><i data-lucide="menu" class="w-6 h-6"></i></button>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <h1>AdClickEarn</h1>
+            </div>
+            <div class="user-section">
+                <div class="balance-box">
+                    <span>BALANCE</span>
+                    <span class="balance-amount"><span class="bdt-symbol">৳</span><span id="current-balance">0.00</span></span>
+                </div>
+                <button class="btn btn-primary" id="login-btn">Login</button>
+                <button class="btn btn-success" id="register-btn">Sign up</button>
+                <button class="btn btn-danger" id="logout-btn" style="display: none;">Logout</button>
+            </div>
         </header>
 
-        <div class="main-content-container">
-            <aside class="sidebar">
-                <div class="p-4 text-2xl font-bold text-white">Webvisit Earn</div>
-                <nav class="mt-8">
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="dashboard-page" data-title="Dashboard"><i data-lucide="home" class="w-5 h-5 mr-3"></i>Dashboard</a>
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="users-page" data-title="Users"><i data-lucide="users" class="w-5 h-5 mr-3"></i>Users</a>
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="withdrawals-page" data-title="Withdrawals"><i data-lucide="dollar-sign" class="w-5 h-5 mr-3"></i>Withdrawals</a>
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="notifications-page" data-title="Notifications"><i data-lucide="send" class="w-5 h-5 mr-3"></i>Notifications</a>
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="website-tasks-page" data-title="Website Tasks"><i data-lucide="globe" class="w-5 h-5 mr-3"></i>Website Tasks</a>
-                    <a href="#" class="nav-link flex items-center py-3 px-4" data-page="settings-page" data-title="Settings"><i data-lucide="settings" class="w-5 h-5 mr-3"></i>Settings</a>
-                    <a href="#" id="admin-logout-btn" class="flex items-center py-3 px-4 mt-8"><i data-lucide="log-out" class="w-5 h-5 mr-3"></i>Logout</a>
-                </nav>
-            </aside>
-            <div class="sidebar-overlay"></div>
+        <!-- PROFILE PANEL -->
+        <div id="profile-panel" class="panel">
+            <div class="profile-grid">
+                <div class="stat-card"><span class="stat-label">Username</span><div class="stat-value" id="profile-username">-</div></div>
+                <div class="stat-card"><span class="stat-label">Member since</span><div class="stat-value" id="profile-joined">-</div></div>
+                <div class="stat-card"><span class="stat-label">Total clicks</span><div class="stat-value" id="profile-clicks">0</div></div>
+                <div class="stat-card"><span class="stat-label">Total earned</span><div class="stat-value" id="profile-earned">৳0</div></div>
+                <div class="stat-card"><span class="stat-label">Today's clicks</span><div class="stat-value" id="profile-today-clicks">0/200</div></div>
+                <div class="stat-card"><span class="stat-label">Referral earnings</span><div class="stat-value" id="profile-ref-earn">৳0</div></div>
+            </div>
 
-            <main class="main-content flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-                 <h1 id="desktop-page-title" class="text-3xl font-bold mb-6 hidden md:block">Dashboard</h1>
+            <div class="referral-box">
+                <h3 style="display: flex; gap: 10px; align-items: center; color: #fbbf24;"><i class="fas fa-gift"></i> Your referral program</h3>
+                <p style="color: #cbd5e1;">You get <strong>৳50</strong> per friend, they get <strong>৳30</strong> instantly.</p>
+                <div class="ref-link-container">
+                    <input type="text" class="ref-link" id="referral-link-display" readonly>
+                    <button class="ref-copy-btn" id="copy-ref-btn"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: center; margin: 20px 0 8px;">
+                    <button class="btn btn-purple" id="share-fb"><i class="fab fa-facebook-f"></i></button>
+                    <button class="btn btn-purple" id="share-wa"><i class="fab fa-whatsapp"></i></button>
+                    <button class="btn btn-purple" id="share-tg"><i class="fab fa-telegram"></i></button>
+                </div>
+            </div>
+
+            <div class="withdraw-section">
+                <h3><i class="fas fa-wallet"></i> Withdraw (min ৳500)</h3>
+                <div style="font-size: 2rem; font-weight: 700; color: #fbbf24;">৳<span id="withdraw-balance">0.00</span></div>
+                <div class="progress-bar"><div class="progress-fill" id="withdraw-progress" style="width:0%"></div></div>
+                <p id="withdraw-hint" style="color:#94a3b8;">Need ৳500 to withdraw</p>
+                <button class="btn btn-success" id="withdraw-request-btn" style="margin-top: 15px; width: 100%;">Withdraw now</button>
+            </div>
+        </div>
+
+        <!-- TASK PANEL -->
+        <div id="task-panel" class="panel">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 40px; padding: 20px;">
+                <h2><i class="fas fa-tasks"></i> Today's tasks – ৳0.60 per click</h2>
+                <p style="color:#9ca3af;">Complete up to 200 ads per day</p>
+            </div>
+            <div class="ads-container" id="ads-container"></div>
+        </div>
+
+        <!-- SETTINGS PANEL -->
+        <div id="settings-panel" class="panel">
+            <div style="background: rgba(0,0,0,0.3); border-radius: 40px; padding: 24px;">
+                <h3 style="margin-bottom: 20px;"><i class="fas fa-cog"></i> Account settings</h3>
+                <div class="setting-item">
+                    <span>Dark mode</span>
+                    <div class="toggle-switch" id="dark-mode-toggle"></div>
+                </div>
+                <div style="margin: 30px 0;">
+                    <h4>Change password</h4>
+                    <div class="form-group">
+                        <label>Current password</label>
+                        <input type="password" id="current-password" placeholder="••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>New password</label>
+                        <input type="password" id="new-password" placeholder="min 6 characters">
+                    </div>
+                    <button class="btn btn-primary" id="change-password-btn" style="width:100%;">Update password</button>
+                </div>
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="color:#94a3b8;">Email: <span id="settings-email">-</span></p>
+                    <p style="color:#94a3b8;">Referral code: <span id="settings-refcode">-</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <div class="bottom-nav">
+        <button class="nav-item" id="nav-profile"><i class="fas fa-user"></i><span>Profile</span></button>
+        <button class="nav-item active" id="nav-task"><i class="fas fa-play-circle"></i><span>Task</span></button>
+        <button class="nav-item" id="nav-withdraw"><i class="fas fa-hand-holding-usd"></i><span>Withdraw</span></button>
+        <button class="nav-item" id="nav-ai"><i class="fas fa-robot"></i><span>AI</span></button>
+        <button class="nav-item" id="nav-setting"><i class="fas fa-sliders-h"></i><span>Settings</span></button>
+    </div>
+
+    <!-- MODALS -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Login</h3><button class="close-modal">×</button></div>
+            <form id="login-form">
+                <div class="form-group"><label>Username</label><input type="text" id="login-username" required></div>
+                <div class="form-group"><label>Password</label><input type="password" id="login-password" required></div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+            </form>
+            <p style="margin-top:15px; text-align:center;">No account? <a href="#" id="switch-to-register" style="color:#fbbf24;">Sign up</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Sign up</h3><button class="close-modal">×</button></div>
+            <form id="register-form">
+                <div class="form-group"><label>Username</label><input type="text" id="register-username" required></div>
+                <div class="form-group"><label>Email</label><input type="email" id="register-email" required></div>
+                <div class="form-group"><label>Password (min 6)</label><input type="password" id="register-password" required></div>
+                <div class="form-group"><label>Referral code (optional)</label><input type="text" id="register-referral" placeholder="e.g. 56844"></div>
+                <button type="submit" class="btn btn-success" style="width:100%;">Create account</button>
+            </form>
+            <p style="margin-top:15px; text-align:center;">Already have account? <a href="#" id="switch-to-login" style="color:#fbbf24;">Login</a></p>
+        </div>
+    </div>
+
+    <div class="modal" id="withdraw-modal">
+        <div class="modal-content">
+            <div class="modal-header"><h3>Withdraw</h3><button class="close-modal">×</button></div>
+            <div id="withdraw-form">
+                <p>Your balance: ৳<span id="modal-balance">0.00</span></p>
+                <div class="form-group"><label>Payment method</label>
+                    <select id="payment-method">
+                        <option value="bkash">bKash</option>
+                        <option value="nagad">Nagad</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="rocket">Rocket</option>
+                    </select>
+                </div>
+                <div class="form-group"><label id="payment-details-label">Account number</label><input type="text" id="payment-details" placeholder="Enter account"></div>
+                <button class="btn btn-success" id="confirm-withdraw-btn" style="width:100%;">Confirm withdraw ৳500</button>
+            </div>
+            <div id="withdraw-success" style="display:none; text-align:center;">
+                <i class="fas fa-check-circle" style="font-size:4rem; color:#10b981;"></i>
+                <h3>Request sent!</h3>
+                <p>We'll process within 24h.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI CHAT MODAL -->
+    <div class="modal" id="ai-chat-modal">
+        <div class="modal-content" style="padding:0; overflow:hidden;">
+            <div style="background:#0f2a40; padding:18px; display:flex; justify-content:space-between;">
+                <h3 style="color:white;"><i class="fas fa-robot"></i> AI Assistant</h3>
+                <button class="close-modal" style="color:white;">×</button>
+            </div>
+            <div id="chat-messages" style="height:300px; overflow-y:auto; padding:15px;"></div>
+            <div style="display:flex; padding:10px;">
+                <input id="chat-input" style="flex:1; padding:12px; border-radius:40px; background:#1e3a4a; border:none; color:white;" placeholder="Ask...">
+                <button id="chat-send-btn" style="background:#fbbf24; border:none; width:50px; border-radius:40px; margin-left:8px;"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- CONFIG ----------
+            const EARN_PER_CLICK = 0.60;
+            const WITHDRAW_LIMIT = 500;
+            const DAILY_AD_LIMIT = 200;
+            const REFERRER_BONUS = 50;
+            const REFEREE_BONUS = 30;
+            const TG_BASE = "https://t.me/adclickbd_bot?start=";
+
+            // ---------- AD LINKS (provided by user, deduplicated to keep it clean) ----------
+            const adLinks = [
+                "https://progenybanquet.com/dsj4ug5tz?key=618f6fe78e0d792db723742816a2d866",
+                "https://zobaerhasan.blogspot.com/",
+                "https://progenybanquet.com/q489p2sz4?key=8d1d716a03277052cf546c6b424cfc9c",
+                "https://otieu.com/4/10248735",
+                "https://wwp.ailooe.com/redirect-zone/ae0a37f4",
+                "https://progenybanquet.com/sfn33s5iih?key=d79dbeee8367db2efa67bd05f3df9675",
+                "https://tinyurl.com/Nucciba",
+                "https://progenybanquet.com/vp8vd3gx?key=3650327b8916680f59445f08ed9a14e0",
+                "https://otieu.com/4/10427035",
+                "https://wwp.ailooe.com/redirect-zone/73c3553d",
+                "https://otieu.com/4/10332961"
+            ];
+
+            // ---------- STATE ----------
+            let allUsers = JSON.parse(localStorage.getItem('adclick_users')) || [];
+            let currentUser = null;
+
+            // DOM elements
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+            const profilePanel = document.getElementById('profile-panel');
+            const taskPanel = document.getElementById('task-panel');
+            const settingsPanel = document.getElementById('settings-panel');
+            const navProfile = document.getElementById('nav-profile');
+            const navTask = document.getElementById('nav-task');
+            const navWithdraw = document.getElementById('nav-withdraw');
+            const navAi = document.getElementById('nav-ai');
+            const navSetting = document.getElementById('nav-setting');
+            const adsContainer = document.getElementById('ads-container');
+            const currentBalanceSpan = document.getElementById('current-balance');
+            const withdrawBalanceSpan = document.getElementById('withdraw-balance');
+            const withdrawProgress = document.getElementById('withdraw-progress');
+            const withdrawHint = document.getElementById('withdraw-hint');
+            const refLinkDisplay = document.getElementById('referral-link-display');
+            const copyRefBtn = document.getElementById('copy-ref-btn');
+            const confirmWithdrawBtn = document.getElementById('confirm-withdraw-btn');
+            const darkToggle = document.getElementById('dark-mode-toggle');
+            const changePasswordBtn = document.getElementById('change-password-btn');
+            const settingsEmail = document.getElementById('settings-email');
+            const settingsRefcode = document.getElementById('settings-refcode');
+
+            // Profile fields
+            const profileUsername = document.getElementById('profile-username');
+            const profileJoined = document.getElementById('profile-joined');
+            const profileClicks = document.getElementById('profile-clicks');
+            const profileEarned = document.getElementById('profile-earned');
+            const profileTodayClicks = document.getElementById('profile-today-clicks');
+            const profileRefEarn = document.getElementById('profile-ref-earn');
+
+            // Helper: save all users
+            function saveAllUsers() {
+                localStorage.setItem('adclick_users', JSON.stringify(allUsers));
+            }
+
+            // Generate unique 5-digit referral code
+            function generateReferralCode() {
+                let code;
+                do { code = Math.floor(10000 + Math.random() * 90000).toString(); } 
+                while (allUsers.some(u => u.referralCode === code));
+                return code;
+            }
+
+            // Refresh UI based on currentUser
+            function refreshUI() {
+                if (!currentUser) {
+                    // logged out
+                    currentBalanceSpan.innerText = '0.00';
+                    profileUsername.innerText = 'Guest';
+                    profileJoined.innerText = '-';
+                    profileClicks.innerText = '0';
+                    profileEarned.innerText = '৳0';
+                    profileTodayClicks.innerText = '0/200';
+                    profileRefEarn.innerText = '৳0';
+                    withdrawBalanceSpan.innerText = '0.00';
+                    withdrawProgress.style.width = '0%';
+                    withdrawHint.innerText = `Need ৳${WITHDRAW_LIMIT} to withdraw`;
+                    refLinkDisplay.value = `${TG_BASE}?????`;
+                    settingsEmail.innerText = '-';
+                    settingsRefcode.innerText = '-';
+                    loginBtn.style.display = 'block';
+                    registerBtn.style.display = 'block';
+                    logoutBtn.style.display = 'none';
+                    return;
+                }
+
+                const u = currentUser;
+                currentBalanceSpan.innerText = u.balance.toFixed(2);
+                profileUsername.innerText = u.username;
+                profileJoined.innerText = u.joinDate || '-';
+                profileClicks.innerText = u.totalClicks || 0;
+                profileEarned.innerText = `৳${(u.totalEarnings || 0).toFixed(2)}`;
+                profileTodayClicks.innerText = `${u.todayClicks || 0}/${DAILY_AD_LIMIT}`;
+                profileRefEarn.innerText = `৳${(u.referralEarnings || 0).toFixed(2)}`;
+                withdrawBalanceSpan.innerText = u.balance.toFixed(2);
+                const perc = Math.min(100, (u.balance / WITHDRAW_LIMIT) * 100);
+                withdrawProgress.style.width = perc + '%';
+                withdrawHint.innerText = u.balance >= WITHDRAW_LIMIT ? '✅ You can withdraw now!' : `Need ৳${(WITHDRAW_LIMIT - u.balance).toFixed(2)} more`;
+                refLinkDisplay.value = TG_BASE + u.referralCode;
+                settingsEmail.innerText = u.email || '-';
+                settingsRefcode.innerText = u.referralCode || '-';
+
+                loginBtn.style.display = 'none';
+                registerBtn.style.display = 'none';
+                logoutBtn.style.display = 'block';
+            }
+
+            // Update currentUser in allUsers and save
+            function syncCurrentUser() {
+                if (!currentUser) return;
+                const idx = allUsers.findIndex(u => u.username === currentUser.username);
+                if (idx !== -1) allUsers[idx] = currentUser;
+                saveAllUsers();
+            }
+
+            // Notification
+            function notify(msg, type = 'success') {
+                const n = document.createElement('div');
+                n.className = `notification ${type}`;
+                n.innerText = msg;
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 3500);
+            }
+
+            // Render ads in task panel
+            function renderAds() {
+                if (!currentUser || currentUser.isAccountBanned) {
+                    adsContainer.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px;">Please login to see tasks</div>';
+                    return;
+                }
+                let html = '';
+                for (let i = 1; i <= DAILY_AD_LIMIT; i++) {
+                    if (currentUser.hiddenAds && currentUser.hiddenAds.includes(i)) continue;
+                    const clicked = currentUser.clickedAds && currentUser.clickedAds.includes(i);
+                    const disabled = clicked || currentUser.todayClicks >= DAILY_AD_LIMIT;
+                    html += `<div class="ad-card" id="ad-card-${i}">
+                        <div class="ad-header"><span class="ad-id">#${i}</span><span class="ad-amount">+৳${EARN_PER_CLICK}</span></div>
+                        <button class="ad-btn" id="ad-btn-${i}" ${disabled ? 'disabled' : ''}><i class="fas fa-mouse-pointer"></i> ${clicked ? 'Clicked' : 'Earn'}</button>
+                    </div>`;
+                }
+                adsContainer.innerHTML = html || '<div style="grid-column:1/-1; padding:30px;">🎉 All ads completed today</div>';
+                for (let i = 1; i <= DAILY_AD_LIMIT; i++) {
+                    if (currentUser.hiddenAds && currentUser.hiddenAds.includes(i)) continue;
+                    const btn = document.getElementById(`ad-btn-${i}`);
+                    if (btn && !btn.disabled) {
+                        btn.addEventListener('click', () => handleAdClick(i));
+                    }
+                }
+            }
+
+            function handleAdClick(adId) {
+                if (!currentUser) return notify('Login first', 'error');
+                if ((currentUser.clickedAds && currentUser.clickedAds.includes(adId)) || currentUser.todayClicks >= DAILY_AD_LIMIT) return;
                 
-                <div id="dashboard-page" class="page">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="stat-card p-6"><h2 class="text-gray-500 text-lg">Total Users</h2><p id="total-users" class="text-4xl font-bold mt-2">0</p></div>
-                        <div class="stat-card p-6"><h2 class="text-gray-500 text-lg">Pending Withdrawals</h2><p id="pending-withdrawals" class="text-4xl font-bold mt-2">0</p></div>
-                        <div class="stat-card p-6"><h2 class="text-gray-500 text-lg">Total Earned ($)</h2><p id="total-earned" class="text-4xl font-bold mt-2">0</p></div>
-                        <div class="stat-card p-6"><h2 class="text-gray-500 text-lg">Active Today</h2><p id="active-today" class="text-4xl font-bold mt-2">0</p></div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                        <div class="stat-card p-6">
-                            <h2 class="text-gray-500 text-lg mb-4">Recent Withdrawals</h2>
-                            <div id="recent-withdrawals" class="space-y-3 max-h-80 overflow-y-auto">
-                                <!-- Dynamic content -->
-                            </div>
-                        </div>
-                        <div class="stat-card p-6">
-                            <h2 class="text-gray-500 text-lg mb-4">Quick Actions</h2>
-                            <div class="grid grid-cols-2 gap-4">
-                                <button onclick="navigateTo('users-page', 'Users')" class="btn btn-primary">Manage Users</button>
-                                <button onclick="navigateTo('withdrawals-page', 'Withdrawals')" class="btn btn-success">Process Withdrawals</button>
-                                <button onclick="navigateTo('notifications-page', 'Notifications')" class="btn btn-primary">Send Notification</button>
-                                <button onclick="navigateTo('website-tasks-page', 'Website Tasks')" class="btn">Website Tasks</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                // Open a real ad link from the provided list (cycle through them)
+                const linkIndex = (adId - 1) % adLinks.length;
+                window.open(adLinks[linkIndex], '_blank');
 
-                <div id="users-page" class="page">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                        <h2 class="text-2xl font-bold">User Management</h2>
-                        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-                            <input type="text" id="search-user" placeholder="Search by email or name..." class="px-4 py-2 border rounded-lg flex-grow">
-                            <button onclick="exportUsers()" class="btn btn-primary">Export Users</button>
-                            <button onclick="showAddUserModal()" class="btn btn-success">Add User</button>
-                        </div>
-                    </div>
-                    <div class="bg-white shadow rounded-lg overflow-x-auto">
-                        <table class="min-w-full">
-                            <thead><tr><th>Name</th><th>Email</th><th>Balance</th><th>Earned</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-                            <tbody id="users-table-body"></tbody>
-                        </table>
-                    </div>
-                    <div class="mt-4 flex justify-center">
-                        <div id="user-pagination" class="flex gap-2"></div>
-                    </div>
-                </div>
+                currentUser.balance = (currentUser.balance || 0) + EARN_PER_CLICK;
+                currentUser.totalEarnings = (currentUser.totalEarnings || 0) + EARN_PER_CLICK;
+                currentUser.todayClicks = (currentUser.todayClicks || 0) + 1;
+                currentUser.totalClicks = (currentUser.totalClicks || 0) + 1;
+                currentUser.clickedAds = currentUser.clickedAds || [];
+                currentUser.clickedAds.push(adId);
+                currentUser.hiddenAds = currentUser.hiddenAds || [];
+                currentUser.hiddenAds.push(adId);
+                syncCurrentUser();
+                refreshUI();
+                renderAds();
+                notify(`+৳${EARN_PER_CLICK} earned!`, 'success');
+            }
 
-                <div id="withdrawals-page" class="page">
-                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="filterWithdrawals('pending')" class="btn btn-primary">Pending</button>
-                            <button onclick="filterWithdrawals('approved')" class="btn btn-success">Approved</button>
-                            <button onclick="filterWithdrawals('rejected')" class="btn btn-danger">Rejected</button>
-                            <button onclick="filterWithdrawals('all')" class="btn bg-gray-200">All</button>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="date" id="withdrawal-date-filter" class="px-4 py-2 border rounded-lg">
-                            <button onclick="exportWithdrawals()" class="btn btn-primary">Export</button>
-                        </div>
-                    </div>
-                     <div class="bg-white shadow rounded-lg overflow-x-auto">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>User Name</th>
-                                    <th>Amount ($)</th>
-                                    <th>Method</th>
-                                    <th>Payment Number</th> 
-                                    <th>Requested At</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="withdrawals-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
+            // Apply referral bonus on registration (fixed: now referrer gets update and it's saved)
+            function applyReferralBonus(referralCode, newUser) {
+                if (!referralCode) return;
+                const referrer = allUsers.find(u => u.referralCode === referralCode);
+                if (!referrer || referrer.username === newUser.username) return;
+                
+                // Give referrer bonus
+                referrer.balance = (referrer.balance || 0) + REFERRER_BONUS;
+                referrer.referralEarnings = (referrer.referralEarnings || 0) + REFERRER_BONUS;
+                
+                // Give new user bonus
+                newUser.balance = (newUser.balance || 0) + REFEREE_BONUS;
+                newUser.totalEarnings = (newUser.totalEarnings || 0) + REFEREE_BONUS;
+                newUser.referredBy = referralCode;
+                
+                // No need to reassign referrer in allUsers because it's already a reference, but we'll ensure it's saved later
+                // (allUsers is updated automatically, and we'll call saveAllUsers after push)
+                
+                notify(`You got ৳${REFEREE_BONUS} bonus from referral!`, 'success');
+                // Optionally notify referrer? Not possible since they're not logged in, but balance is updated in DB.
+            }
 
-                <div id="notifications-page" class="page">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="stat-card p-6">
-                            <h3 class="text-xl font-bold mb-4">Send Notification</h3>
-                            <div class="mb-4"><label for="notification-title" class="block font-semibold mb-2">Title</label><input type="text" id="notification-title" class="w-full px-4 py-2 border rounded-lg" placeholder="Notification Title"></div>
-                            <div class="mb-6"><label for="notification-message" class="block font-semibold mb-2">Message</label><textarea id="notification-message" rows="4" class="w-full px-4 py-2 border rounded-lg" placeholder="Type your message here..."></textarea></div>
-                            <div class="mb-6">
-                                <label class="block font-semibold mb-2">Send To:</label>
-                                <div class="flex flex-wrap gap-4">
-                                    <label class="inline-flex items-center"><input type="radio" name="send-to" value="all" checked class="mr-2"> All Users</label>
-                                    <label class="inline-flex items-center"><input type="radio" name="send-to" value="active" class="mr-2"> Active Users Only</label>
-                                    <label class="inline-flex items-center"><input type="radio" name="send-to" value="inactive" class="mr-2"> Inactive Users Only</label>
-                                </div>
-                            </div>
-                            <button id="send-notification-btn" class="btn btn-primary w-full">Send Notification</button>
-                        </div>
-                        
-                        <div class="stat-card p-6">
-                            <h3 class="text-xl font-bold mb-4">Notification History</h3>
-                            <div id="notification-history" class="space-y-3 max-h-96 overflow-y-auto">
-                                <!-- Notifications will appear here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            // ---------- REGISTER ----------
+            document.getElementById('register-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('register-username').value.trim();
+                const email = document.getElementById('register-email').value.trim();
+                const password = document.getElementById('register-password').value;
+                const referralCode = document.getElementById('register-referral').value.trim();
 
-                <!-- New Website Tasks Page -->
-                <div id="website-tasks-page" class="page">
-                    <div class="space-y-8">
-                        <div class="stat-card p-6">
-                            <h3 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">Website Visit Tasks (5 Websites × 20 Visits Each)</h3>
-                            <p class="text-gray-600 mb-6">Set up 5 different websites for users to visit. Each website can be visited 20 times per day.</p>
-                            
-                            <div class="website-visit-container" id="website-visit-container">
-                                <!-- Dynamic content for 5 websites -->
-                            </div>
-                        </div>
+                if (!username || !email || !password) return notify('All fields required', 'error');
+                if (password.length < 6) return notify('Password must be at least 6 characters', 'error');
+                if (allUsers.some(u => u.username === username)) return notify('Username already taken', 'error');
 
-                        <div class="stat-card p-6">
-                            <button id="save-website-tasks-btn" class="btn btn-primary w-full py-3 text-lg shadow-lg">Save All Website Tasks</button>
-                        </div>
-                    </div>
-                </div>
+                const newUser = {
+                    username,
+                    email,
+                    password,
+                    joinDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+                    balance: 0,
+                    totalEarnings: 0,
+                    referralEarnings: 0,
+                    totalClicks: 0,
+                    todayClicks: 0,
+                    todayEarnings: 0,
+                    isAccountBanned: false,
+                    clickedAds: [],
+                    hiddenAds: [],
+                    referralCode: generateReferralCode(),
+                    referredBy: null,
+                };
 
-                <div id="settings-page" class="page">
-                    <div class="space-y-8">
-                        <!-- General Settings -->
-                        <div class="stat-card p-6">
-                            <h3 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">General Config</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                                <div><label for="min-withdrawal" class="block font-semibold mb-2 text-sm">Min Withdrawal (Coins)</label><input type="number" id="min-withdrawal" class="w-full px-4 py-2 border rounded-lg"></div>
-                                <div><label for="daily-ad-limit" class="block font-semibold mb-2 text-sm">Daily Task Limit</label><input type="number" id="daily-ad-limit" class="w-full px-4 py-2 border rounded-lg"></div>
-                            </div>
+                if (referralCode) applyReferralBonus(referralCode, newUser);
 
-                            <div class="mb-6">
-                                <label class="block font-semibold mb-2 text-sm">Coin Value</label>
-                                <div class="flex items-center space-x-2">
-                                    <input type="number" id="coin-value-coins" class="w-full px-4 py-2 border rounded-lg" placeholder="Coins">
-                                    <span class="font-semibold text-gray-600">= $</span>
-                                    <input type="number" id="coin-value-dollar" class="w-full px-4 py-2 border rounded-lg" placeholder="Dollar">
-                                </div>
-                            </div>
-                            <div class="mb-6"><label class="block font-semibold mb-2 text-sm">Payment Methods (comma-separated)</label><input type="text" id="payment-methods" class="w-full px-4 py-2 border rounded-lg" placeholder="e.g. bKash,Nagad,Rocket"></div>
-                        </div>
+                allUsers.push(newUser);
+                saveAllUsers(); // saves both new user and updated referrer
+                currentUser = newUser;
+                localStorage.setItem('currentUsername', username);
+                refreshUI();
+                renderAds();
+                closeModal('register-modal');
+                notify(`Welcome ${username}! Your referral link is ready.`, 'success');
+                setActivePanel('task');
+            });
 
-                        <!-- Social Links -->
-                        <div class="stat-card p-6">
-                            <h3 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2">Profile Social Links</h3>
-                            <div class="space-y-4 mb-6">
-                                <div><label class="block font-semibold mb-1 text-sm text-blue-600">Telegram Bot Link</label><input type="url" id="link-telegram" class="w-full px-4 py-2 border rounded-lg" placeholder="https://t.me/webmoneybot_bot" value="https://t.me/webmoneybot_bot"></div>
-                                <div><label class="block font-semibold mb-1 text-sm text-blue-800">Facebook Page Link</label><input type="url" id="link-facebook" class="w-full px-4 py-2 border rounded-lg" placeholder="https://facebook.com/yourpage"></div>
-                                <div><label class="block font-semibold mb-1 text-sm text-green-600">Contact Admin (Telegram)</label><input type="url" id="link-admin" class="w-full px-4 py-2 border rounded-lg" placeholder="https://t.me/admin_username"></div>
-                            </div>
-                        </div>
+            // ---------- LOGIN ----------
+            document.getElementById('login-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value;
+                const user = allUsers.find(u => u.username === username && u.password === password);
+                if (!user) return notify('Invalid username or password', 'error');
+                if (user.isAccountBanned) return notify('Account banned', 'error');
+                currentUser = user;
+                localStorage.setItem('currentUsername', username);
+                refreshUI();
+                renderAds();
+                closeModal('login-modal');
+                notify(`Welcome back, ${username}!`);
+                setActivePanel('task');
+            });
 
-                        <!-- Save Button -->
-                        <div class="stat-card p-6">
-                            <button id="save-settings-btn" class="btn btn-primary w-full py-3 text-lg shadow-lg">Save All Settings</button>
-                        </div>
-                    </div>
-                </div>
+            // ---------- LOGOUT ----------
+            logoutBtn.addEventListener('click', () => {
+                currentUser = null;
+                localStorage.removeItem('currentUsername');
+                refreshUI();
+                renderAds();
+                setActivePanel('task');
+                notify('Logged out');
+            });
 
-            </main>
-        </div>
-    </div>
-    
-    <div id="admin-login-view" class="min-h-screen flex items-center justify-center bg-gray-100">
-        <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h1 class="text-3xl font-bold text-center text-gray-900">Admin Panel Login</h1>
-            <input id="admin-email" type="email" placeholder="Admin Email" class="w-full px-4 py-2 border rounded-lg">
-            <input id="admin-password" type="password" placeholder="Password" class="w-full px-4 py-2 border rounded-lg">
-            <button id="admin-login-btn" class="w-full btn btn-primary">Login</button>
-        </div>
-    </div>
+            // ---------- WITHDRAW ----------
+            document.getElementById('withdraw-request-btn').addEventListener('click', () => {
+                if (!currentUser) return notify('Login first', 'error');
+                if (currentUser.balance < WITHDRAW_LIMIT) return notify(`Need at least ৳${WITHDRAW_LIMIT}`, 'error');
+                openModal('withdraw-modal');
+                document.getElementById('modal-balance').innerText = currentUser.balance.toFixed(2);
+            });
+            confirmWithdrawBtn.addEventListener('click', () => {
+                if (!currentUser) return;
+                currentUser.balance = 0;
+                syncCurrentUser();
+                refreshUI();
+                document.getElementById('withdraw-form').style.display = 'none';
+                document.getElementById('withdraw-success').style.display = 'block';
+                setTimeout(() => { 
+                    closeModal('withdraw-modal'); 
+                    document.getElementById('withdraw-form').style.display = 'block'; 
+                    document.getElementById('withdraw-success').style.display = 'none'; 
+                }, 2000);
+                notify('Withdrawal request submitted!', 'success');
+            });
 
-    <!-- Add User Modal -->
-    <div id="add-user-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Add New User</h3>
-            <div class="space-y-4">
-                <div><label class="block font-semibold mb-1">Full Name</label><input type="text" id="new-user-name" class="w-full px-4 py-2 border rounded-lg"></div>
-                <div><label class="block font-semibold mb-1">Email</label><input type="email" id="new-user-email" class="w-full px-4 py-2 border rounded-lg"></div>
-                <div><label class="block font-semibold mb-1">Initial Balance</label><input type="number" id="new-user-balance" value="0" class="w-full px-4 py-2 border rounded-lg"></div>
-                <div><label class="block font-semibold mb-1">Password</label><input type="password" id="new-user-password" class="w-full px-4 py-2 border rounded-lg"></div>
-            </div>
-            <div class="flex justify-end gap-2 mt-6">
-                <button onclick="closeAddUserModal()" class="btn">Cancel</button>
-                <button onclick="createNewUser()" class="btn btn-primary">Create User</button>
-            </div>
-        </div>
-    </div>
+            // ---------- REFERRAL COPY & SHARE ----------
+            copyRefBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(refLinkDisplay.value);
+                notify('Referral link copied!');
+            });
+            document.getElementById('share-fb').addEventListener('click', () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(refLinkDisplay.value)}`));
+            document.getElementById('share-wa').addEventListener('click', () => window.open(`https://wa.me/?text=${encodeURIComponent('Earn money clicking ads: '+refLinkDisplay.value)}`));
+            document.getElementById('share-tg').addEventListener('click', () => window.open(`https://t.me/share/url?url=${encodeURIComponent(refLinkDisplay.value)}&text=${encodeURIComponent('Join AdClickEarn')}`));
 
-    <script type="module">
-        const firebaseConfig = {
-            apiKey: "AIzaSyA-KqjNK8mqasHj19_d44dDmdTA762us4Q",
-            authDomain: "lifebook-e32b2.firebaseapp.com",
-            databaseURL: "https://lifebook-e32b2-default-rtdb.firebaseio.com",
-            projectId: "lifebook-e32b2",
-            storageBucket: "lifebook-e32b2.firebasestorage.app",
-            messagingSenderId: "668509068623",
-            appId: "1:668509068623:web:08d4156ef2a6cb7407393a",
-            measurementId: "G-SVFBRSFF7M"
-        };
-        
-        // ADMIN UIDS - আপনার UID এখানে যোগ করা হয়েছে
-        const ADMIN_UIDS = ["kHh1YaSyqrdjRQVMJDy3kadiZCT2"];
+            // ---------- BOTTOM NAVIGATION ----------
+            function setActivePanel(panel) {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                profilePanel.classList.remove('active-panel');
+                taskPanel.classList.remove('active-panel');
+                settingsPanel.classList.remove('active-panel');
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, query, where, onSnapshot, addDoc, serverTimestamp, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+                if (panel === 'profile') {
+                    navProfile.classList.add('active');
+                    profilePanel.classList.add('active-panel');
+                    refreshUI();
+                } else if (panel === 'task') {
+                    navTask.classList.add('active');
+                    taskPanel.classList.add('active-panel');
+                    renderAds();
+                } else if (panel === 'withdraw') {
+                    navWithdraw.classList.add('active');
+                    if (!currentUser) notify('Login to withdraw', 'info');
+                    else document.getElementById('withdraw-request-btn').click();
+                } else if (panel === 'ai') {
+                    navAi.classList.add('active');
+                    openModal('ai-chat-modal');
+                } else if (panel === 'settings') {
+                    navSetting.classList.add('active');
+                    settingsPanel.classList.add('active-panel');
+                    if (currentUser) {
+                        settingsEmail.innerText = currentUser.email;
+                        settingsRefcode.innerText = currentUser.referralCode;
+                    }
+                }
+            }
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+            navProfile.addEventListener('click', () => setActivePanel('profile'));
+            navTask.addEventListener('click', () => setActivePanel('task'));
+            navWithdraw.addEventListener('click', () => setActivePanel('withdraw'));
+            navAi.addEventListener('click', () => setActivePanel('ai'));
+            navSetting.addEventListener('click', () => setActivePanel('settings'));
 
-        const loginView = document.getElementById('admin-login-view');
-        const appContainer = document.getElementById('app-container');
-        const sidebar = document.querySelector('.sidebar');
-        const sidebarOverlay = document.querySelector('.sidebar-overlay');
-        const menuToggleBtn = document.getElementById('menu-toggle-btn');
-        const websiteVisitContainer = document.getElementById('website-visit-container');
+            // ---------- MODAL CONTROLS ----------
+            function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+            function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+            document.querySelectorAll('.close-modal').forEach(b => b.addEventListener('click', function() { this.closest('.modal').style.display = 'none'; }));
+            window.addEventListener('click', e => { if (e.target.classList.contains('modal')) e.target.style.display = 'none'; });
+            document.getElementById('switch-to-register').addEventListener('click', (e) => { e.preventDefault(); closeModal('login-modal'); openModal('register-modal'); });
+            document.getElementById('switch-to-login').addEventListener('click', (e) => { e.preventDefault(); closeModal('register-modal'); openModal('login-modal'); });
 
-        let currentWithdrawalFilter = 'pending';
-        let currentUserPage = 1;
-        const usersPerPage = 10;
+            // make login/register buttons open modals
+            loginBtn.addEventListener('click', () => openModal('login-modal'));
+            registerBtn.addEventListener('click', () => openModal('register-modal'));
 
-        function showAlert(message) { 
-            alert(message); 
-        }
-        
-        function showConfirm(message) { 
-            return confirm(message); 
-        }
+            // ---------- SETTINGS: DARK MODE + CHANGE PASSWORD ----------
+            darkToggle.addEventListener('click', () => {
+                darkToggle.classList.toggle('active');
+                document.body.classList.toggle('dark-mode');
+            });
+            changePasswordBtn.addEventListener('click', () => {
+                if (!currentUser) return notify('Login first', 'error');
+                const current = document.getElementById('current-password').value;
+                const newPass = document.getElementById('new-password').value;
+                if (current !== currentUser.password) return notify('Current password incorrect', 'error');
+                if (newPass.length < 6) return notify('New password min 6 characters', 'error');
+                currentUser.password = newPass;
+                syncCurrentUser();
+                notify('Password updated successfully');
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+            });
 
-        window.onload = () => {
-            lucide.createIcons();
-            setupEventListeners();
-            generateWebsiteVisitInputs();
-            onAuthStateChanged(auth, (user) => {
-                if (user && ADMIN_UIDS.includes(user.uid)) {
-                    loginView.style.display = 'none';
-                    appContainer.classList.remove('hidden');
-                    navigateTo('dashboard-page', 'Dashboard');
-                    loadDashboardData();
-                    loadUsers();
-                    loadWithdrawals();
-                    loadSettings();
-                    loadWebsiteTasks();
-                    loadNotificationHistory();
+            // ---------- AI CHAT ----------
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const chatSend = document.getElementById('chat-send-btn');
+            function addChat(msg, isUser) {
+                const d = document.createElement('div');
+                d.style.margin = '8px 0';
+                d.style.textAlign = isUser ? 'right' : 'left';
+                d.innerHTML = `<span style="background:${isUser?'#fbbf24':'#1e3a4a'}; color:black; padding:8px 15px; border-radius:30px; display:inline-block;">${msg}</span>`;
+                chatMessages.appendChild(d);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            chatSend.addEventListener('click', () => {
+                if (!chatInput.value) return;
+                addChat(chatInput.value, true);
+                const q = chatInput.value.toLowerCase();
+                setTimeout(() => {
+                    if (q.includes('balance')) addChat(currentUser ? `Your balance: ৳${currentUser.balance}` : 'Login to see balance', false);
+                    else if (q.includes('withdraw')) addChat(`Minimum withdraw is ৳${WITHDRAW_LIMIT}`, false);
+                    else if (q.includes('refer')) addChat('Share your link & earn ৳50 per referral!', false);
+                    else addChat('I can help with earnings, clicks, referrals.', false);
+                }, 400);
+                chatInput.value = '';
+            });
+
+            // ---------- SESSION RESTORE ----------
+            const savedUsername = localStorage.getItem('currentUsername');
+            if (savedUsername) {
+                const found = allUsers.find(u => u.username === savedUsername);
+                if (found && !found.isAccountBanned) {
+                    currentUser = found;
                 } else {
-                    loginView.style.display = 'flex';
-                    appContainer.classList.add('hidden');
-                }
-            });
-        };
-        
-        function closeSidebar() { 
-            sidebar.classList.remove('show'); 
-        }
-
-        function navigateTo(pageId, pageTitle) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-                if (link.dataset.page === pageId) link.classList.add('active');
-            });
-            document.getElementById('page-title').textContent = pageTitle;
-            document.getElementById('desktop-page-title').textContent = pageTitle;
-            closeSidebar();
-        }
-
-        function setupEventListeners() {
-            document.getElementById('admin-login-btn').addEventListener('click', handleAdminLogin);
-            document.getElementById('admin-logout-btn').addEventListener('click', () => signOut(auth));
-            document.getElementById('save-settings-btn').addEventListener('click', saveSettings);
-            document.getElementById('save-website-tasks-btn').addEventListener('click', saveWebsiteTasks);
-            document.getElementById('send-notification-btn').addEventListener('click', sendNotification);
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', (e) => { 
-                    e.preventDefault(); 
-                    navigateTo(link.dataset.page, link.dataset.title); 
-                });
-            });
-            menuToggleBtn.addEventListener('click', () => sidebar.classList.toggle('show'));
-            sidebarOverlay.addEventListener('click', closeSidebar);
-            
-            // Search user functionality
-            document.getElementById('search-user').addEventListener('input', function(e) {
-                searchUsers(e.target.value);
-            });
-        }
-
-        function generateWebsiteVisitInputs() {
-            let html = '';
-            for (let i = 1; i <= 5; i++) {
-                html += `
-                    <div class="website-visit-item">
-                        <div class="task-link-number">${i}</div>
-                        <h3 class="font-bold text-lg mb-2">Website ${i}</h3>
-                        <div class="mb-3">
-                            <label class="block font-semibold mb-1 text-sm">Website URL</label>
-                            <input type="url" id="website-url-${i}" class="w-full px-3 py-2 border rounded-lg" placeholder="https://example.com">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block font-semibold mb-1 text-sm">Website Name</label>
-                            <input type="text" id="website-name-${i}" class="w-full px-3 py-2 border rounded-lg" placeholder="Website ${i} Name">
-                        </div>
-                        <div class="mb-3">
-                            <label class="block font-semibold mb-1 text-sm">Reward per Visit (Coins)</label>
-                            <input type="number" id="website-reward-${i}" class="w-full px-3 py-2 border rounded-lg" value="50">
-                        </div>
-                        <div class="text-sm text-gray-600">
-                            <p><i data-lucide="info" class="w-4 h-4 inline mr-1"></i> Users can visit this website 20 times per day</p>
-                        </div>
-                    </div>
-                `;
-            }
-            websiteVisitContainer.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        async function handleAdminLogin() {
-            const email = document.getElementById('admin-email').value;
-            const password = document.getElementById('admin-password').value;
-            if (!email || !password) {
-                showAlert("Please enter both email and password");
-                return;
-            }
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                if (!ADMIN_UIDS.includes(userCredential.user.uid)) {
-                    await signOut(auth);
-                    showAlert("You are not authorized to access this panel.");
-                }
-            } catch (error) { 
-                showAlert("Login failed: " + error.message); 
-            }
-        }
-
-        async function loadDashboardData() {
-            // Total Users
-            onSnapshot(collection(db, "users"), snap => { 
-                document.getElementById('total-users').textContent = snap.size; 
-            });
-            
-            // Pending Withdrawals
-            onSnapshot(query(collection(db, "withdrawals"), where("status", "==", "pending")), snap => { 
-                document.getElementById('pending-withdrawals').textContent = snap.size; 
-            });
-            
-            // Total Earned calculation
-            onSnapshot(query(collection(db, "withdrawals"), where("status", "==", "approved")), snap => {
-                let total = 0;
-                snap.forEach(doc => {
-                    total += parseFloat(doc.data().amount) || 0;
-                });
-                document.getElementById('total-earned').textContent = (total / 1000).toFixed(2); // Convert coins to dollars
-            });
-            
-            // Active Today (users who logged in today)
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            onSnapshot(query(collection(db, "users"), where("lastLogin", ">=", today)), snap => {
-                document.getElementById('active-today').textContent = snap.size;
-            });
-            
-            // Recent Withdrawals
-            onSnapshot(query(collection(db, "withdrawals"), orderBy("requestedAt", "desc"), limit(10)), snap => {
-                const container = document.getElementById('recent-withdrawals');
-                container.innerHTML = '';
-                
-                if (snap.empty) {
-                    container.innerHTML = '<p class="text-gray-500 text-center">No recent withdrawals</p>';
-                    return;
-                }
-                
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const date = data.requestedAt?.toDate().toLocaleDateString() || 'N/A';
-                    const statusColor = data.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                                      data.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                                      'bg-yellow-100 text-yellow-800';
-                    const dollars = (data.amount / 1000).toFixed(2); // Convert coins to dollars
-                    
-                    const item = `
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div>
-                                <p class="font-semibold">${data.userName || 'Unknown'}</p>
-                                <p class="text-sm text-gray-500">${date}</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-bold">$${dollars}</p>
-                                <span class="px-2 py-1 text-xs rounded-full ${statusColor}">${data.status}</span>
-                            </div>
-                        </div>
-                    `;
-                    container.innerHTML += item;
-                });
-            });
-        }
-
-        function loadUsers() {
-            const usersTableBody = document.getElementById('users-table-body');
-            const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                usersTableBody.innerHTML = '';
-                const users = [];
-                snapshot.forEach(doc => {
-                    users.push({ id: doc.id, ...doc.data() });
-                });
-                
-                // Pagination
-                const totalPages = Math.ceil(users.length / usersPerPage);
-                const startIndex = (currentUserPage - 1) * usersPerPage;
-                const endIndex = startIndex + usersPerPage;
-                const paginatedUsers = users.slice(startIndex, endIndex);
-                
-                // Display users
-                paginatedUsers.forEach(user => {
-                    const isBlocked = user.isBlocked || false;
-                    const joinDate = user.createdAt?.toDate().toLocaleDateString() || 'N/A';
-                    const totalEarned = (user.totalEarned || 0) / 1000; // Convert to dollars
-                    
-                    const row = `<tr class="hover:bg-gray-50">
-                        <td class="whitespace-nowrap">${user.name || 'N/A'}</td>
-                        <td>${user.email}</td>
-                        <td>${user.balance || 0}</td>
-                        <td>$${totalEarned.toFixed(2)}</td>
-                        <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isBlocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${isBlocked ? 'Blocked' : 'Active'}</span></td>
-                        <td class="text-sm text-gray-500">${joinDate}</td>
-                        <td class="space-x-2">
-                            <button class="btn text-xs ${isBlocked ? 'btn-success' : 'btn-danger'}" onclick="window.toggleBlockUser('${user.id}', ${isBlocked})">${isBlocked ? 'Unblock' : 'Block'}</button>
-                            <button class="btn text-xs btn-primary" onclick="window.viewUserDetails('${user.id}')">View</button>
-                        </td>
-                    </tr>`;
-                    usersTableBody.innerHTML += row;
-                });
-                
-                // Generate pagination buttons
-                const paginationContainer = document.getElementById('user-pagination');
-                paginationContainer.innerHTML = '';
-                
-                for (let i = 1; i <= totalPages; i++) {
-                    const button = document.createElement('button');
-                    button.textContent = i;
-                    button.className = `px-3 py-1 rounded ${i === currentUserPage ? 'bg-blue-600 text-white' : 'bg-gray-200'}`;
-                    button.onclick = () => {
-                        currentUserPage = i;
-                        loadUsers();
-                    };
-                    paginationContainer.appendChild(button);
-                }
-            });
-        }
-
-        async function searchUsers(searchTerm) {
-            const usersTableBody = document.getElementById('users-table-body');
-            usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Searching...</td></tr>';
-            
-            const usersRef = collection(db, "users");
-            const snapshot = await getDocs(usersRef);
-            const results = [];
-            
-            snapshot.forEach(doc => {
-                const user = doc.data();
-                if (user.email.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                    (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase()))) {
-                    results.push({ id: doc.id, ...user });
-                }
-            });
-            
-            usersTableBody.innerHTML = '';
-            if (results.length === 0) {
-                usersTableBody.innerHTML = '<tr><td colspan="7" class="text-center py-4">No users found</td></tr>';
-                return;
-            }
-            
-            results.forEach(user => {
-                const isBlocked = user.isBlocked || false;
-                const joinDate = user.createdAt?.toDate().toLocaleDateString() || 'N/A';
-                const totalEarned = (user.totalEarned || 0) / 1000; // Convert to dollars
-                
-                const row = `<tr class="hover:bg-gray-50">
-                    <td class="whitespace-nowrap">${user.name || 'N/A'}</td>
-                    <td>${user.email}</td>
-                    <td>${user.balance || 0}</td>
-                    <td>$${totalEarned.toFixed(2)}</td>
-                    <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${isBlocked ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}">${isBlocked ? 'Blocked' : 'Active'}</span></td>
-                    <td class="text-sm text-gray-500">${joinDate}</td>
-                    <td>
-                        <button class="btn text-xs ${isBlocked ? 'btn-success' : 'btn-danger'}" onclick="window.toggleBlockUser('${user.id}', ${isBlocked})">${isBlocked ? 'Unblock' : 'Block'}</button>
-                    </td>
-                </tr>`;
-                usersTableBody.innerHTML += row;
-            });
-        }
-
-        function loadWithdrawals(status = 'pending') {
-            const withdrawalsTableBody = document.getElementById('withdrawals-table-body');
-            let q;
-            
-            if (status === 'all') {
-                q = query(collection(db, "withdrawals"), orderBy("requestedAt", "desc"));
-            } else {
-                q = query(collection(db, "withdrawals"), where("status", "==", status), orderBy("requestedAt", "desc"));
-            }
-            
-            onSnapshot(q, (snapshot) => {
-                withdrawalsTableBody.innerHTML = '';
-                if (snapshot.empty) {
-                    withdrawalsTableBody.innerHTML = '<tr><td colspan="8" class="text-center text-gray-500 py-4">No withdrawal requests found.</td></tr>';
-                    return;
-                }
-                
-                snapshot.forEach(docSnap => {
-                    const request = docSnap.data();
-                    const requestedDate = request.requestedAt?.toDate().toLocaleString() || 'N/A';
-                    const paymentNum = request.paymentNumber || request.accountNumber || request.phoneNumber || request.paymentDetail || 'N/A';
-                    const statusColor = request.status === 'approved' ? 'bg-green-100 text-green-800' : 
-                                      request.status === 'rejected' ? 'bg-red-100 text-red-800' : 
-                                      'bg-yellow-100 text-yellow-800';
-                    const dollars = (request.amount / 1000).toFixed(2); // Convert coins to dollars
-
-                    const row = `<tr class="hover:bg-gray-50">
-                        <td class="text-xs text-gray-500">${docSnap.id.substring(0, 8)}...</td>
-                        <td>${request.userName || 'N/A'}</td>
-                        <td class="font-bold">$${dollars}</td>
-                        <td>${request.method}</td>
-                        <td class="font-mono text-blue-600 font-bold">${paymentNum}</td>
-                        <td>${requestedDate}</td>
-                        <td><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">${request.status}</span></td>
-                        <td class="flex flex-col sm:flex-row gap-2">
-                            ${request.status === 'pending' ? `
-                                <button class="btn btn-success text-xs" onclick="window.handleWithdrawal('${docSnap.id}', 'approved')">Approve</button>
-                                <button class="btn btn-danger text-xs" onclick="window.handleWithdrawal('${docSnap.id}', 'rejected')">Reject</button>
-                            ` : '<span class="text-gray-500 text-sm">Processed</span>'}
-                        </td>
-                    </tr>`;
-                    withdrawalsTableBody.innerHTML += row;
-                });
-            });
-        }
-
-        window.filterWithdrawals = function(status) {
-            currentWithdrawalFilter = status;
-            loadWithdrawals(status === 'all' ? 'all' : status);
-        };
-
-        async function loadWebsiteTasks() {
-            try {
-                const docSnap = await getDoc(doc(db, "config", "websiteTasks"));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // Load all 5 website tasks
-                    for (let i = 1; i <= 5; i++) {
-                        if (data[`websiteUrl${i}`]) {
-                            document.getElementById(`website-url-${i}`).value = data[`websiteUrl${i}`];
-                        }
-                        if (data[`websiteName${i}`]) {
-                            document.getElementById(`website-name-${i}`).value = data[`websiteName${i}`];
-                        }
-                        if (data[`websiteReward${i}`]) {
-                            document.getElementById(`website-reward-${i}`).value = data[`websiteReward${i}`];
-                        }
-                    }
-                }
-            } catch (error) { 
-                console.error("Error loading website tasks:", error); 
-            }
-        }
-
-        async function loadSettings() {
-            try {
-                const docSnap = await getDoc(doc(db, "config", "main"));
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    
-                    // General Config
-                    document.getElementById('min-withdrawal').value = data.minWithdrawal || 5000;
-                    document.getElementById('daily-ad-limit').value = data.dailyAdLimit || 15;
-                    document.getElementById('coin-value-coins').value = data.coinValueCoins || 1000;
-                    document.getElementById('coin-value-dollar').value = data.coinValueDollar || 1;
-                    document.getElementById('payment-methods').value = (data.paymentMethods || []).join(',');
-
-                    // Social Links
-                    document.getElementById('link-telegram').value = data.linkTelegram || 'https://t.me/webmoneybot_bot';
-                    document.getElementById('link-facebook').value = data.linkFacebook || '';
-                    document.getElementById('link-admin').value = data.linkAdmin || '';
-                }
-            } catch (error) { 
-                console.error("Error loading settings:", error); 
-                showAlert("Error loading settings: " + error.message);
-            }
-        }
-
-        async function loadNotificationHistory() {
-            try {
-                const q = query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(10));
-                const snapshot = await getDocs(q);
-                const container = document.getElementById('notification-history');
-                container.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    container.innerHTML = '<p class="text-gray-500 text-center">No notifications sent yet</p>';
-                    return;
-                }
-                
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const date = data.createdAt?.toDate().toLocaleString() || 'N/A';
-                    
-                    const item = `
-                        <div class="p-3 bg-gray-50 rounded-lg">
-                            <div class="flex justify-between items-start">
-                                <h4 class="font-bold">${data.title}</h4>
-                                <span class="text-xs text-gray-500">${date}</span>
-                            </div>
-                            <p class="mt-2 text-sm">${data.message}</p>
-                            <p class="text-xs text-gray-500 mt-1">Sent to: ${data.sentTo || 'All Users'}</p>
-                        </div>
-                    `;
-                    container.innerHTML += item;
-                });
-            } catch (error) {
-                console.error("Error loading notifications:", error);
-            }
-        }
-
-        window.toggleBlockUser = async (userId, isBlocked) => {
-            const action = isBlocked ? 'unblock' : 'block';
-            if (showConfirm(`Are you sure you want to ${action} this user?`)) {
-                try {
-                    await updateDoc(doc(db, "users", userId), { 
-                        isBlocked: !isBlocked,
-                        blockedAt: !isBlocked ? serverTimestamp() : null
-                    });
-                    showAlert(`User has been successfully ${action}ed.`);
-                } catch (error) { 
-                    showAlert(`Error: ${error.message}`); 
+                    localStorage.removeItem('currentUsername');
                 }
             }
-        };
-
-        window.handleWithdrawal = async (requestId, newStatus) => {
-            const action = newStatus === 'approved' ? 'approve' : 'reject';
-            if (showConfirm(`Are you sure you want to ${action} this withdrawal request?`)) {
-                const requestRef = doc(db, "withdrawals", requestId);
-                try {
-                    const requestSnap = await getDoc(requestRef);
-                    if (!requestSnap.exists()) {
-                        showAlert("Request not found!");
-                        return;
-                    }
-                    
-                    const requestData = requestSnap.data();
-                    
-                    if (newStatus === 'rejected') {
-                        // Return money to user's balance
-                        const userRef = doc(db, "users", requestData.userId);
-                        const userSnap = await getDoc(userRef);
-                        
-                        if(userSnap.exists()){
-                            const userData = userSnap.data();
-                            const currentBalance = userData.balance || 0;
-                            await updateDoc(userRef, { 
-                                balance: currentBalance + parseInt(requestData.amount) 
-                            });
-                        }
-                    }
-                    
-                    await updateDoc(requestRef, { 
-                        status: newStatus,
-                        processedAt: serverTimestamp(),
-                        processedBy: auth.currentUser.uid
-                    });
-                    
-                    showAlert(`Withdrawal request has been ${newStatus}.`);
-                    
-                    // Send notification to user
-                    await addDoc(collection(db, "notifications"), {
-                        title: `Withdrawal Request ${newStatus}`,
-                        message: `Your withdrawal request of $${(requestData.amount / 1000).toFixed(2)} has been ${newStatus}.`,
-                        userId: requestData.userId,
-                        createdAt: serverTimestamp()
-                    });
-                    
-                } catch (error) { 
-                    showAlert(`Error: ${error.message}`); 
-                }
-            }
-        };
-
-        async function sendNotification() {
-            const title = document.getElementById('notification-title').value.trim();
-            const message = document.getElementById('notification-message').value.trim();
-            const sendTo = document.querySelector('input[name="send-to"]:checked').value;
-            
-            if (!title || !message) {
-                showAlert("Title and message are both required.");
-                return;
-            }
-            
-            try {
-                // Get all users
-                const usersSnapshot = await getDocs(collection(db, "users"));
-                const notifications = [];
-                
-                usersSnapshot.forEach(doc => {
-                    const user = doc.data();
-                    
-                    // Check if we should send to this user
-                    if (sendTo === 'active' && user.isBlocked) {
-                        return; // Skip blocked users if "active only" is selected
-                    }
-                    if (sendTo === 'inactive' && !user.isBlocked) {
-                        return; // Skip active users if "inactive only" is selected
-                    }
-                    
-                    notifications.push({
-                        title,
-                        message,
-                        userId: doc.id,
-                        createdAt: serverTimestamp(),
-                        read: false
-                    });
-                });
-                
-                // Send individual notifications
-                for (const notification of notifications) {
-                    await addDoc(collection(db, "userNotifications"), notification);
-                }
-                
-                // Save to notification history
-                await addDoc(collection(db, "notifications"), {
-                    title,
-                    message,
-                    sentTo: sendTo === 'all' ? 'All Users' : 
-                           sendTo === 'active' ? 'Active Users Only' : 'Inactive Users Only',
-                    sentBy: auth.currentUser.uid,
-                    createdAt: serverTimestamp()
-                });
-                
-                showAlert(`Notification has been sent to ${notifications.length} users!`);
-                document.getElementById('notification-title').value = '';
-                document.getElementById('notification-message').value = '';
-                
-                // Refresh notification history
-                loadNotificationHistory();
-                
-            } catch (error) { 
-                showAlert(`Error: ${error.message}`); 
-            }
-        }
-
-        async function saveWebsiteTasks() {
-            const websiteTasksData = {};
-            
-            // Save all 5 website tasks
-            for (let i = 1; i <= 5; i++) {
-                websiteTasksData[`websiteUrl${i}`] = document.getElementById(`website-url-${i}`).value.trim();
-                websiteTasksData[`websiteName${i}`] = document.getElementById(`website-name-${i}`).value.trim();
-                websiteTasksData[`websiteReward${i}`] = parseInt(document.getElementById(`website-reward-${i}`).value) || 50;
-            }
-            
-            websiteTasksData.lastUpdated = serverTimestamp();
-            websiteTasksData.updatedBy = auth.currentUser.uid;
-
-            try {
-                await setDoc(doc(db, "config", "websiteTasks"), websiteTasksData, { merge: true });
-                showAlert("Website tasks have been saved successfully!");
-                
-            } catch (error) { 
-                showAlert(`Error saving website tasks: ${error.message}`); 
-            }
-        }
-
-        async function saveSettings() {
-            const settingsData = {
-                minWithdrawal: parseInt(document.getElementById('min-withdrawal').value) || 0,
-                dailyAdLimit: parseInt(document.getElementById('daily-ad-limit').value) || 0,
-                coinValueCoins: parseInt(document.getElementById('coin-value-coins').value) || 0,
-                coinValueDollar: parseFloat(document.getElementById('coin-value-dollar').value) || 0,
-                paymentMethods: document.getElementById('payment-methods').value.split(',').map(s => s.trim()).filter(Boolean),
-                
-                // Saving Social Links
-                linkTelegram: document.getElementById('link-telegram').value.trim(),
-                linkFacebook: document.getElementById('link-facebook').value.trim(),
-                linkAdmin: document.getElementById('link-admin').value.trim(),
-                
-                lastUpdated: serverTimestamp(),
-                updatedBy: auth.currentUser.uid
-            };
-
-            try {
-                await setDoc(doc(db, "config", "main"), settingsData, { merge: true });
-                showAlert("Settings have been saved successfully!");
-                
-            } catch (error) { 
-                showAlert(`Error saving settings: ${error.message}`); 
-            }
-        }
-
-        window.exportUsers = async function() {
-            try {
-                const usersSnapshot = await getDocs(collection(db, "users"));
-                let csvContent = "Name,Email,Balance,Earned,Status,Joined Date,Last Login\n";
-                
-                usersSnapshot.forEach(doc => {
-                    const user = doc.data();
-                    csvContent += `"${user.name || ''}","${user.email}",${user.balance || 0},${(user.totalEarned || 0) / 1000},"${user.isBlocked ? 'Blocked' : 'Active'}","${user.createdAt?.toDate().toLocaleDateString() || ''}","${user.lastLogin?.toDate().toLocaleDateString() || 'Never'}"\n`;
-                });
-                
-                // Create and download CSV file
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                showAlert("Users exported successfully!");
-            } catch (error) {
-                showAlert("Error exporting users: " + error.message);
-            }
-        };
-
-        window.exportWithdrawals = async function() {
-            try {
-                const q = query(collection(db, "withdrawals"), orderBy("requestedAt", "desc"));
-                const snapshot = await getDocs(q);
-                let csvContent = "ID,User Name,Amount,Method,Payment Number,Status,Requested At,Processed At\n";
-                
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    csvContent += `"${doc.id.substring(0, 8)}","${data.userName || ''}",$${(data.amount / 1000).toFixed(2)},${data.method},"${data.paymentNumber || ''}",${data.status},"${data.requestedAt?.toDate().toLocaleString() || ''}","${data.processedAt?.toDate().toLocaleString() || ''}"\n`;
-                });
-                
-                // Create and download CSV file
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `withdrawals_export_${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-                
-                showAlert("Withdrawals exported successfully!");
-            } catch (error) {
-                showAlert("Error exporting withdrawals: " + error.message);
-            }
-        };
-
-        window.showAddUserModal = function() {
-            document.getElementById('add-user-modal').classList.remove('hidden');
-            document.getElementById('add-user-modal').classList.add('flex');
-        };
-
-        window.closeAddUserModal = function() {
-            document.getElementById('add-user-modal').classList.add('hidden');
-            document.getElementById('add-user-modal').classList.remove('flex');
-            document.getElementById('new-user-name').value = '';
-            document.getElementById('new-user-email').value = '';
-            document.getElementById('new-user-balance').value = '0';
-            document.getElementById('new-user-password').value = '';
-        };
-
-        window.createNewUser = async function() {
-            const name = document.getElementById('new-user-name').value.trim();
-            const email = document.getElementById('new-user-email').value.trim();
-            const balance = parseInt(document.getElementById('new-user-balance').value) || 0;
-            const password = document.getElementById('new-user-password').value;
-            
-            if (!name || !email || !password) {
-                showAlert("Please fill in all required fields");
-                return;
-            }
-            
-            try {
-                // Create user in Firebase Authentication
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const userId = userCredential.user.uid;
-                
-                // Create user document in Firestore
-                await setDoc(doc(db, "users", userId), {
-                    name: name,
-                    email: email,
-                    balance: balance,
-                    totalEarned: 0,
-                    isBlocked: false,
-                    createdAt: serverTimestamp(),
-                    lastLogin: serverTimestamp(),
-                    referralCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
-                    completedTasks: [],
-                    dailyTaskCount: 0,
-                    lastTaskDate: null,
-                    websiteVisits: {
-                        1: 0,
-                        2: 0,
-                        3: 0,
-                        4: 0,
-                        5: 0
-                    },
-                    lastWebsiteVisitDate: null
-                });
-                
-                showAlert("User created successfully!");
-                closeAddUserModal();
-                loadUsers(); // Refresh user list
-                
-            } catch (error) {
-                showAlert("Error creating user: " + error.message);
-            }
-        };
-
-        window.viewUserDetails = async function(userId) {
-            try {
-                const userDoc = await getDoc(doc(db, "users", userId));
-                if (userDoc.exists()) {
-                    const user = userDoc.data();
-                    let details = `User Details:\n\n`;
-                    details += `Name: ${user.name || 'N/A'}\n`;
-                    details += `Email: ${user.email}\n`;
-                    details += `Balance: ${user.balance || 0} coins\n`;
-                    details += `Total Earned: $${((user.totalEarned || 0) / 1000).toFixed(2)}\n`;
-                    details += `Status: ${user.isBlocked ? 'Blocked' : 'Active'}\n`;
-                    details += `Joined: ${user.createdAt?.toDate().toLocaleDateString() || 'N/A'}\n`;
-                    details += `Last Login: ${user.lastLogin?.toDate().toLocaleString() || 'Never'}\n`;
-                    details += `Referral Code: ${user.referralCode || 'N/A'}\n`;
-                    details += `Website Visits: \n`;
-                    
-                    if (user.websiteVisits) {
-                        for (let i = 1; i <= 5; i++) {
-                            details += `  Website ${i}: ${user.websiteVisits[i] || 0}/20 visits today\n`;
-                        }
-                    }
-                    
-                    showAlert(details);
-                }
-            } catch (error) {
-                showAlert("Error loading user details: " + error.message);
-            }
-        };
+            refreshUI();
+            renderAds();
+            setActivePanel('task');
+        })();
     </script>
+    <!-- external ad scripts (unchanged) -->
+    <script src="https://progenybanquet.com/5ebc1045fa01306bf05cec3f6b5466a2/invoke.js"></script>
+    <script data-cfasync='false' src='//wwr.giriudog.com/?tag=40bf9eaa'></script>
 </body>
 </html>
